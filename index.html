@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ToolsPackNew — All-in-one Utilities</title>
+  <meta name="description" content="ToolsPackNew — Modern multi-tool web app (Calculator, Converters, Text Utils, Base64, JSON, Hash, Image tools, Color, Timers, Notes and more). Pure HTML/CSS/JS.">
+  <!-- Theme color for mobile -->
+  <meta name="theme-color" content="#1E1E2F" />
+  <style>
+    /* ========== Base / Reset ========== */
+    :root{
+      --bg: #1E1E2F;
+      --card: #23233a;
+      --muted: #9aa0b4;
+      --accent: #6EE7B7;
+      --accent-2: #7dd3fc;
+      --glass: rgba(255,255,255,0.03);
+      --glass-2: rgba(255,255,255,0.02);
+      --radius: 12px;
+      --gap: 18px;
+      --maxwidth: 1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg) 0%, #121221 100%);
+      color:#E6EEF3;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:24px;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap:20px;
+      min-height:100vh;
+    }
+    /* Container */
+    .app{
+      width:100%;
+      max-width:var(--maxwidth);
+    }
+    header{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:48px;
+      height:48px;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;
+      font-weight:700;color:#061018;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    }
+    h1{font-size:18px;margin:0}
+    p.subtitle{margin:0;color:var(--muted);font-size:13px}
+
+    /* Controls */
+    .controls{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .search{
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,0.03);
+      padding:10px 12px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:220px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    .search input{
+      background:transparent;border:0;color:inherit;outline:none;font-size:14px;width:200px;
+    }
+    .btn{
+      background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.04);
+      padding:9px 12px;border-radius:10px;color:var(--accent);
+      cursor:pointer;font-weight:600;font-size:13px;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.secondary{color:var(--muted);background:transparent}
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
+      background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:8px;font-size:12px;color:var(--muted)
+    }
+
+    /* Grid of tools */
+    .tools-grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:var(--gap);
+      margin-top:12px;
+    }
+    @media (max-width:1000px){ .tools-grid{grid-template-columns: repeat(2,1fr);} }
+    @media (max-width:680px){ .tools-grid{grid-template-columns: 1fr;} }
+
+    /* Card */
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);
+      padding:16px;
+      border-radius:var(--radius);
+      min-height:120px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      transition: transform .14s ease, box-shadow .14s ease;
+      display:flex;flex-direction:column;gap:10px;
+    }
+    .card:hover{ transform: translateY(-6px); box-shadow: 0 20px 40px rgba(2,6,23,0.8) }
+    .card h3{margin:0;font-size:15px}
+    .card .meta{font-size:12px;color:var(--muted)}
+    .io{display:flex;gap:8px;flex-wrap:wrap}
+    .input, .output, select, textarea{background:transparent;border:1px dashed rgba(255,255,255,0.03);padding:10px;border-radius:8px;color:inherit;outline:none;font-size:14px}
+    textarea{min-height:90px;resize:vertical}
+    .row{display:flex;gap:8px;align-items:center}
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:13px}
+    .flex{display:flex;gap:8px;align-items:center}
+    .grow{flex:1}
+    .tools-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:13px}
+
+    /* Ad placeholder */
+    .ad-slot{
+      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px dashed rgba(255,255,255,0.035);
+      padding:12px;border-radius:10px;text-align:center;color:var(--muted);
+      margin:12px 0;
+    }
+
+    /* Command palette modal */
+    .cpanel{
+      position:fixed;left:50%;top:12%;
+      transform:translateX(-50%);min-width:320px;max-width:720px;width:80%;
+      background:rgba(6,8,12,0.9);border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 30px 60px rgba(2,6,23,0.8);backdrop-filter: blur(6px);
+      display:none;flex-direction:column;gap:8px;z-index:9999;
+    }
+    .cpanel.show{display:flex}
+    .cpanel input{padding:12px;border-radius:8px;border:0;background:transparent;color:inherit;font-size:16px}
+    .cpanel .list{max-height:320px;overflow:auto}
+    .cpanel .item{padding:10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+    .cpanel .item:hover{background:rgba(255,255,255,0.02)}
+
+    /* Tiny helpers */
+    .copy{
+      padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);
+      font-size:13px;cursor:pointer;
+    }
+    .notice{font-size:13px;color:var(--muted)}
+    a.inline{color:var(--accent);text-decoration:none;font-weight:600}
+    footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
+    /* Accessibility focus */
+    :focus{outline: 3px solid rgba(110,231,183,0.15);outline-offset:2px}
+  </style>
+</head>
+<body>
+  <main class="app" id="app" role="main" aria-label="ToolsPackNew application">
+    <header>
+      <div class="brand" role="banner">
+        <div class="logo" aria-hidden="true">TP</div>
+        <div>
+          <h1>ToolsPackNew</h1>
+          <p class="subtitle">Premium, lightweight toolbox — no dependencies · Dark by default</p>
+        </div>
+      </div>
+
+      <div class="controls" role="region" aria-label="Global controls">
+        <div class="search" title="Search tools (filter by name)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <input id="globalSearch" placeholder="Search tools (Ctrl/Cmd+K)" aria-label="Search tools" />
+          <span class="kbd">Ctrl/Cmd+K</span>
+        </div>
+
+        <button class="btn" id="openCmd" aria-haspopup="dialog" title="Open command palette">Open Command Palette</button>
+        <button class="btn secondary" id="toggleAds" title="Toggle Ad placeholders">Ads Ready</button>
+      </div>
+    </header>
+
+    <!-- Optional ad placeholder (Google Ads ready) -->
+    <div class="ad-slot" id="adTop" aria-hidden="true">
+      <!-- Google Ads slot placeholder. Replace with your ad code. -->
+      <div style="font-size:13px">AD SLOT — Google Ads ready (paste your ad code here)</div>
+    </div>
+
+    <!-- Tools grid -->
+    <section class="tools-grid" id="toolsGrid" aria-label="Tool cards container">
+      <!-- Cards will be injected statically below -->
+      <!-- 1 Calculator -->
+      <article class="card tool-card" data-name="Calculator" id="card-calculator" role="region" aria-labelledby="calcTitle">
+        <div>
+          <h3 id="calcTitle">Calculator</h3>
+          <div class="meta">Basic arithmetic — click buttons or type expression (Enter)</div>
+        </div>
+        <div class="io">
+          <input id="calcInput" class="input" aria-label="Calculator input" placeholder="e.g. 12 * (3 + 4) - 5" />
+          <div class="flex">
+            <button class="btn" id="calcEval">Evaluate</button>
+            <button class="btn secondary" id="calcClear">Clear</button>
+          </div>
+        </div>
+        <div class="tools-footer">
+          <div class="muted">Result:</div>
+          <div id="calcResult" class="muted small" aria-live="polite">—</div>
+        </div>
+      </article>
+
+      <!-- 2 Unit Converter -->
+      <article class="card tool-card" data-name="Unit Converter" id="card-converter" role="region" aria-labelledby="convTitle">
+        <div><h3 id="convTitle">Unit Converter</h3><div class="meta">Length, Weight, Temperature</div></div>
+        <div class="row io">
+          <select id="convType" class="input" aria-label="Converter type">
+            <option value="length">Length (m / km / cm / in / ft)</option>
+            <option value="weight">Weight (kg / g / lb / oz)</option>
+            <option value="temp">Temperature (C / F / K)</option>
+          </select>
+          <input id="convValue" class="input" type="number" placeholder="Value" aria-label="Value to convert" />
+          <select id="convFrom" class="input" aria-label="Convert from"></select>
+          <select id="convTo" class="input" aria-label="Convert to"></select>
+          <button class="btn" id="convDo">Convert</button>
+        </div>
+        <div class="tools-footer">
+          <div class="muted">Output:</div><div id="convResult" class="muted small">—</div>
+        </div>
+      </article>
+
+      <!-- 3 Text Utilities -->
+      <article class="card tool-card" data-name="Text Utilities" id="card-text" role="region" aria-labelledby="textTitle">
+        <div><h3 id="textTitle">Text Utilities</h3><div class="meta">Uppercase, Lowercase, Word count, Remove extra spaces</div></div>
+        <textarea id="textInput" aria-label="Text utilities input" placeholder="Paste text here..."></textarea>
+        <div class="row">
+          <button class="btn" data-action="upper">UPPERCASE</button>
+          <button class="btn" data-action="lower">lowercase</button>
+          <button class="btn" data-action="count">Word Count</button>
+          <button class="btn" data-action="trim">Remove Extra Spaces</button>
+          <button class="copy" id="copyText">Copy</button>
+        </div>
+        <div class="tools-footer">
+          <div class="muted">Result:</div><div id="textResult" class="muted small">—</div>
+        </div>
+      </article>
+
+      <!-- 4 Base64 -->
+      <article class="card tool-card" data-name="Base64" id="card-base64" role="region" aria-labelledby="b64Title">
+        <div><h3 id="b64Title">Base64 Encode / Decode</h3><div class="meta">UTF-8 safe</div></div>
+        <textarea id="b64Input" placeholder="Text..." aria-label="Base64 input"></textarea>
+        <div class="row">
+          <button class="btn" id="b64Enc">Encode</button>
+          <button class="btn" id="b64Dec">Decode</button>
+          <button class="copy" id="b64Copy">Copy</button>
+        </div>
+        <div class="tools-footer">
+          <div class="muted">Output:</div><div id="b64Output" class="muted small">—</div>
+        </div>
+      </article>
+
+      <!-- 5 URL Encode/Decode -->
+      <article class="card tool-card" data-name="URL Encoder" id="card-url" role="region" aria-labelledby="urlTitle">
+        <div><h3 id="urlTitle">URL Encode / Decode</h3><div class="meta">encodeURIComponent / decodeURIComponent</div></div>
+        <input id="urlInput" class="input" placeholder="https://example.com/?q=hello world" aria-label="URL input" />
+        <div class="row">
+          <button class="btn" id="urlEnc">Encode</button>
+          <button class="btn" id="urlDec">Decode</button>
+          <button class="copy" id="urlCopy">Copy</button>
+        </div>
+        <div class="tools-footer">
+          <div class="muted">Output:</div><div id="urlOutput" class="muted small">—</div>
+        </div>
+      </article>
+
+      <!-- 6 JSON Formatter/Validator -->
+      <article class="card tool-card" data-name="JSON Formatter" id="card-json" role="region" aria-labelledby="jsonTitle">
+        <div><h3 id="jsonTitle">JSON Formatter / Validator</h3><div class="meta">Pretty print or validate</div></div>
+        <textarea id="jsonInput" placeholder='{"a":1}' aria-label="JSON input"></textarea>
+        <div class="row">
+          <button class="btn" id="jsonFormat">Format</button>
+          <button class="btn" id="jsonMinify">Minify</button>
+          <button class="btn secondary" id="jsonValidate">Validate</button>
+          <button class="copy" id="jsonCopy">Copy</button>
+        </div>
+        <div class="tools-footer"><div id="jsonOutput" class="muted small">—</div></div>
+      </article>
+
+      <!-- 7 Password Generator -->
+      <article class="card tool-card" data-name="Password Generator" id="card-pass" role="region" aria-labelledby="passTitle">
+        <div><h3 id="passTitle">Password Generator</h3><div class="meta">Customize length & complexity</div></div>
+        <div class="row">
+          <input id="passLen" type="number" min="4" max="128" value="16" class="input" aria-label="Password length" />
+          <label class="muted small" for="passUpper"><input id="passUpper" type="checkbox" checked /> Upper</label>
+          <label class="muted small"><input id="passLower" type="checkbox" checked /> Lower</label>
+          <label class="muted small"><input id="passNums" type="checkbox" checked /> Numbers</label>
+          <label class="muted small"><input id="passSymbols" type="checkbox" checked /> Symbols</label>
+        </div>
+        <div class="row">
+          <button class="btn" id="genPass">Generate</button>
+          <button class="copy" id="copyPass">Copy</button>
+        </div>
+        <div class="tools-footer"><div id="passOutput" class="muted small">—</div></div>
+      </article>
+
+      <!-- 8 UUID v4 -->
+      <article class="card tool-card" data-name="UUID Generator" id="card-uuid" role="region" aria-labelledby="uuidTitle">
+        <div><h3 id="uuidTitle">UUID Generator (v4)</h3><div class="meta">Uses crypto.getRandomValues</div></div>
+        <div class="row">
+          <button class="btn" id="genUUID">Generate UUID</button>
+          <button class="copy" id="copyUUID">Copy</button>
+        </div>
+        <div class="tools-footer"><div id="uuidOutput" class="muted small">—</div></div>
+      </article>
+
+      <!-- 9 Hash Generator (SHA-256) -->
+      <article class="card tool-card" data-name="Hash Generator" id="card-hash" role="region" aria-labelledby="hashTitle">
+        <div><h3 id="hashTitle">Hash Generator — SHA-256</h3><div class="meta">WebCrypto API</div></div>
+        <input id="hashInput" class="input" placeholder="Text to hash" aria-label="Hash input" />
+        <div class="row">
+          <select id="hashFormat" class="input" aria-label="Hash output format">
+            <option value="hex">Hex</option>
+            <option value="base64">Base64</option>
+          </select>
+          <button class="btn" id="hashDo">Generate</button>
+          <button class="copy" id="hashCopy">Copy</button>
+        </div>
+        <div class="tools-footer"><div id="hashOutput" class="muted small">—</div></div>
+      </article>
+
+      <!-- 10 Image Resizer & Compressor -->
+      <article class="card tool-card" data-name="Image Tool" id="card-image" role="region" aria-labelledby="imgTitle">
+        <div><h3 id="imgTitle">Image Resizer & Compressor</h3><div class="meta">Resize, choose quality, download</div></div>
+        <div class="row">
+          <input id="imgFile" type="file" accept="image/*" aria-label="Choose image file" />
+          <input id="imgWidth" class="input" type="number" placeholder="Width (px)" aria-label="Target width" />
+          <input id="imgHeight" class="input" type="number" placeholder="Height (px)" aria-label="Target height" />
+        </div>
+        <div class="row">
+          <label class="muted small">Quality</label>
+          <input id="imgQuality" type="range" min="0.1" max="1" step="0.05" value="0.9" />
+          <button class="btn" id="imgProcess">Process</button>
+          <a id="imgDownload" class="btn secondary" style="text-decoration:none" download="resized.png">Download</a>
+        </div>
+        <canvas id="imgCanvas" style="display:none;"></canvas>
+        <div class="tools-footer"><div id="imgPreview" class="muted small">No image</div></div>
+      </article>
+
+      <!-- 11 Color Picker + Contrast Checker -->
+      <article class="card tool-card" data-name="Color Picker" id="card-color" role="region" aria-labelledby="colorTitle">
+        <div><h3 id="colorTitle">Color Picker + Contrast Checker</h3><div class="meta">Check WCAG contrast ratio</div></div>
+        <div class="row">
+          <input id="colorA" type="color" value="#6ee7b7" aria-label="Color A" />
+          <input id="colorB" type="color" value="#121212" aria-label="Color B" />
+          <button class="btn" id="checkContrast">Check</button>
+        </div>
+        <div class="tools-footer"><div id="contrastOut" class="muted small">—</div></div>
+      </article>
+
+      <!-- 12 Stopwatch & Countdown -->
+      <article class="card tool-card" data-name="Timers" id="card-timers" role="region" aria-labelledby="timerTitle">
+        <div><h3 id="timerTitle">Stopwatch & Countdown</h3><div class="meta">Simple stopwatch and countdown</div></div>
+        <div class="row">
+          <div class="muted small">Countdown (s)</div>
+          <input id="countdownInput" type="number" class="input" placeholder="e.g., 60" aria-label="Countdown seconds" />
+          <button class="btn" id="startCountdown">Start</button>
+          <button class="btn secondary" id="stopCountdown">Stop</button>
+        </div>
+        <div class="row">
+          <div class="muted small">Stopwatch</div>
+          <button class="btn" id="startSW">Start</button>
+          <button class="btn" id="pauseSW">Pause</button>
+          <button class="btn secondary" id="resetSW">Reset</button>
+        </div>
+        <div class="tools-footer"><div id="timerDisplay" class="muted small">00:00.00</div></div>
+      </article>
+
+      <!-- 13 Quick Notes (localStorage) -->
+      <article class="card tool-card" data-name="Quick Notes" id="card-notes" role="region" aria-labelledby="notesTitle">
+        <div><h3 id="notesTitle">Quick Notes</h3><div class="meta">Saved in localStorage</div></div>
+        <textarea id="notesArea" placeholder="Write notes... (autosave)" aria-label="Quick notes"></textarea>
+        <div class="row">
+          <button class="btn" id="saveNotes">Save</button>
+          <button class="btn secondary" id="clearNotes">Clear</button>
+        </div>
+        <div class="tools-footer"><div id="notesStatus" class="muted small">Autosaved locally</div></div>
+      </article>
+    </section>
+
+    <!-- Bottom ad placeholder -->
+    <div class="ad-slot" id="adBottom" aria-hidden="true">
+      <!-- Google Ads slot placeholder. Replace with actual ad code if needed. -->
+      <div style="font-size:13px">AD SLOT — Bottom</div>
+    </div>
+
+    <footer>
+      <div>Made with ❤️ · <span id="version">ToolsPackNew v1.0</span> · <a class="inline" href="#" onclick="alert('No external tracking — this is a placeholder for analytics/ad scripts.');return false;">Ads Ready</a></div>
+    </footer>
+  </main>
+
+  <!-- Command palette markup -->
+  <div class="cpanel" id="cmdPal" role="dialog" aria-modal="true" aria-label="Command palette">
+    <input id="cmdInput" placeholder="Type a tool name, e.g. 'json'..." aria-label="Command palette input" />
+    <div class="list" id="cmdList" role="listbox" aria-label="Command results"></div>
+  </div>
+
+<script>
+/* =========================
+   ToolsPackNew — Single File JS
+   Pure Vanilla JS — Modular blocks for each tool.
+   Commented for maintainability.
+   ========================= */
+
+(() => {
+  // Helper utilities
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => Array.from(document.querySelectorAll(selector));
+  const sanitize = s => String(s ?? '');
+  const isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+
+  /* --------------------
+     Global search (filter cards)
+     -------------------- */
+  const gSearch = $('#globalSearch');
+  const toolCards = $$('.tool-card');
+
+  function filterTools(q){
+    q = q.trim().toLowerCase();
+    toolCards.forEach(card=>{
+      const name = (card.dataset.name||'').toLowerCase();
+      if(!q || name.includes(q)) card.style.display = '';
+      else card.style.display = 'none';
+    });
+  }
+  gSearch.addEventListener('input', e => filterTools(e.target.value));
+  // Pressing Enter on search focuses first visible card input
+  gSearch.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      const visible = toolCards.find(c => c.style.display !== 'none');
+      if(visible){
+        const input = visible.querySelector('input, textarea');
+        if(input) input.focus();
+      }
+    }
+  });
+
+  /* --------------------
+     Command palette (Ctrl/Cmd+K)
+     -------------------- */
+  const cmdPal = $('#cmdPal');
+  const cmdInput = $('#cmdInput');
+  const cmdList = $('#cmdList');
+  const openCmdBtn = $('#openCmd');
+
+  const toolsIndex = toolCards.map(c => ({
+    name: c.dataset.name,
+    id: c.id,
+    el: c
+  }));
+
+  function openCmd(){
+    cmdPal.classList.add('show');
+    cmdInput.value = '';
+    cmdList.innerHTML = '';
+    setTimeout(()=>cmdInput.focus(),100);
+    populateCmd('');
+  }
+  function closeCmd(){
+    cmdPal.classList.remove('show');
+  }
+  function populateCmd(q){
+    q = q.trim().toLowerCase();
+    const matches = toolsIndex.filter(t => !q || t.name.toLowerCase().includes(q)).slice(0,20);
+    cmdList.innerHTML = '';
+    matches.forEach(m=>{
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.tabIndex = 0;
+      div.innerHTML = `<div>${m.name}</div><div class="muted small">${m.id}</div>`;
+      div.onclick = ()=>{ focusTool(m.id); closeCmd(); };
+      div.onkeydown = (e)=>{ if(e.key==='Enter') { div.onclick(); } };
+      cmdList.appendChild(div);
+    });
+  }
+  function focusTool(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    const input = el.querySelector('input, textarea, select, button');
+    if(input) input.focus();
+  }
+  // Bind keyboard
+  document.addEventListener('keydown', (e) => {
+    if((isMac && e.metaKey && e.key.toLowerCase()==='k') || (!isMac && e.ctrlKey && e.key.toLowerCase()==='k')){
+      e.preventDefault(); openCmd();
+    }
+    if(e.key === 'Escape'){ closeCmd(); }
+  });
+  openCmdBtn.addEventListener('click', openCmd);
+  cmdInput.addEventListener('input', (e)=> populateCmd(e.target.value));
+  // clicking outside closes
+  cmdPal.addEventListener('click', (e)=>{ if(e.target === cmdPal) closeCmd(); });
+
+  /* --------------------
+     Google Ads toggle (placeholder)
+     -------------------- */
+  const toggleAds = $('#toggleAds');
+  toggleAds.addEventListener('click', ()=>{
+    const adSlots = [$('#adTop'), $('#adBottom')];
+    adSlots.forEach(s => s.style.display = (s.style.display === 'none' ? '' : 'none'));
+  });
+
+  /* =========================
+     1. Calculator
+     ========================= */
+  const calcInput = $('#calcInput'), calcEvalBtn = $('#calcEval'), calcClear = $('#calcClear'), calcResult = $('#calcResult');
+  function safeEval(expr){
+    // Restrict to arithmetic characters and parentheses to reduce risk
+    // Accept digits, whitespace, + - * / % . ( ) ^
+    if(!expr || typeof expr !== 'string') return 'Invalid';
+    const allowed = /^[0-9+\-*/%.() \t^]+$/;
+    if(!allowed.test(expr)) return 'Only arithmetic expressions allowed';
+    // Replace ^ with ** for exponent
+    expr = expr.replace(/\^/g, '**');
+    try{
+      // eslint-disable-next-line no-eval
+      const result = Function('"use strict";return (' + expr + ')')();
+      if(Number.isFinite(result)) return result;
+      return 'NaN';
+    }catch(err){
+      return 'Error';
+    }
+  }
+  calcEvalBtn.addEventListener('click', ()=> {
+    const out = safeEval(calcInput.value);
+    calcResult.textContent = String(out);
+  });
+  calcClear.addEventListener('click', ()=> { calcInput.value=''; calcResult.textContent='—'; });
+  calcInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') calcEvalBtn.click(); });
+
+  /* =========================
+     2. Unit Converter
+     ========================= */
+  const convType = $('#convType'), convFrom = $('#convFrom'), convTo = $('#convTo'), convValue = $('#convValue'), convDo = $('#convDo'), convResult = $('#convResult');
+
+  const units = {
+    length: ['m','km','cm','mm','in','ft'],
+    weight: ['kg','g','lb','oz'],
+    temp: ['C','F','K']
+  };
+
+  function populateUnits(type){
+    convFrom.innerHTML = '';
+    convTo.innerHTML = '';
+    units[type].forEach(u=>{
+      const o1 = document.createElement('option'); o1.value=u; o1.textContent=u;
+      const o2 = o1.cloneNode(true);
+      convFrom.appendChild(o1); convTo.appendChild(o2);
+    });
+  }
+  convType.addEventListener('change', ()=> populateUnits(convType.value));
+  populateUnits(convType.value);
+
+  function convertUnits(type, val, from, to){
+    val = Number(val);
+    if(isNaN(val)) return 'Invalid value';
+    if(type === 'length'){
+      // convert all to meters then to target
+      const toMeters = { m:1, km:1000, cm:0.01, mm:0.001, in:0.0254, ft:0.3048};
+      const meters = val * toMeters[from];
+      const res = meters / toMeters[to];
+      return res;
+    } else if(type === 'weight'){
+      const toKg = { kg:1, g:0.001, lb:0.45359237, oz:0.0283495231};
+      const kg = val * toKg[from];
+      return kg / toKg[to];
+    } else if(type === 'temp'){
+      // Convert from to C then to target
+      function toC(v, f){
+        if(f==='C') return v;
+        if(f==='F') return (v-32)*5/9;
+        if(f==='K') return v-273.15;
+      }
+      function fromC(c, t){
+        if(t==='C') return c;
+        if(t==='F') return (c*9/5)+32;
+        if(t==='K') return c+273.15;
+      }
+      const c = toC(val, from);
+      return fromC(c, to);
+    }
+    return 'Unsupported';
+  }
+
+  convDo.addEventListener('click', ()=>{
+    const r = convertUnits(convType.value, convValue.value, convFrom.value, convTo.value);
+    convResult.textContent = (typeof r === 'number') ? r : r;
+  });
+
+  /* =========================
+     3. Text Utilities
+     ========================= */
+  const textInput = $('#textInput'), textResult = $('#textResult'), copyTextBtn = $('#copyText');
+  document.querySelectorAll('#card-text .btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.dataset.action;
+      const v = textInput.value;
+      if(act === 'upper'){ textInput.value = v.toUpperCase(); textResult.textContent = 'Converted to UPPERCASE'; }
+      if(act === 'lower'){ textInput.value = v.toLowerCase(); textResult.textContent = 'Converted to lowercase'; }
+      if(act === 'count'){ const words = v.trim() ? v.trim().split(/\s+/).length : 0; textResult.textContent = `${words} words`; }
+      if(act === 'trim'){ textInput.value = v.replace(/\s+/g,' ').trim(); textResult.textContent = 'Extra spaces removed'; }
+    });
+  });
+  copyTextBtn.addEventListener('click', ()=> {
+    navigator.clipboard.writeText(textInput.value).then(()=> textResult.textContent = 'Copied');
+  });
+
+  /* =========================
+     4. Base64 Encode/Decode (UTF-8 safe)
+     ========================= */
+  const b64Input = $('#b64Input'), b64Enc = $('#b64Enc'), b64Dec = $('#b64Dec'), b64Output = $('#b64Output'), b64Copy = $('#b64Copy');
+  function b64Encode(str){
+    // UTF-8 aware
+    const bytes = new TextEncoder().encode(str);
+    let binary = '';
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+    }
+    return btoa(binary);
+  }
+  function b64Decode(str){
+    try{
+      const binary = atob(str);
+      const bytes = new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+      return new TextDecoder().decode(bytes);
+    }catch(e){ return 'Invalid base64'; }
+  }
+  b64Enc.addEventListener('click', ()=> b64Output.textContent = b64Encode(b64Input.value));
+  b64Dec.addEventListener('click', ()=> b64Output.textContent = b64Decode(b64Input.value));
+  b64Copy.addEventListener('click', ()=> navigator.clipboard.writeText(b64Output.textContent).then(()=> b64Output.textContent = b64Output.textContent + ' (copied)'));
+
+  /* =========================
+     5. URL Encode / Decode
+     ========================= */
+  const urlInput = $('#urlInput'), urlEnc = $('#urlEnc'), urlDec = $('#urlDec'), urlOutput = $('#urlOutput'), urlCopy = $('#urlCopy');
+  urlEnc.addEventListener('click', ()=> { try { urlOutput.textContent = encodeURIComponent(urlInput.value); } catch(e){ urlOutput.textContent='Error'; } });
+  urlDec.addEventListener('click', ()=> { try { urlOutput.textContent = decodeURIComponent(urlInput.value); } catch(e){ urlOutput.textContent='Invalid encode'; } });
+  urlCopy.addEventListener('click', ()=> navigator.clipboard.writeText(urlOutput.textContent).then(()=> urlOutput.textContent = urlOutput.textContent + ' (copied)'));
+
+  /* =========================
+     6. JSON Formatter / Validator
+     ========================= */
+  const jsonInput = $('#jsonInput'), jsonFormat = $('#jsonFormat'), jsonMinify = $('#jsonMinify'), jsonValidate = $('#jsonValidate'), jsonOutput = $('#jsonOutput'), jsonCopy = $('#jsonCopy');
+  jsonFormat.addEventListener('click', ()=> {
+    try{
+      const obj = JSON.parse(jsonInput.value);
+      const s = JSON.stringify(obj, null, 2);
+      jsonInput.value = s;
+      jsonOutput.textContent = 'Formatted ✓';
+    }catch(e){ jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+  });
+  jsonMinify.addEventListener('click', ()=> {
+    try{
+      const obj = JSON.parse(jsonInput.value);
+      jsonInput.value = JSON.stringify(obj);
+      jsonOutput.textContent = 'Minified ✓';
+    }catch(e){ jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+  });
+  jsonValidate.addEventListener('click', ()=>{
+    try{
+      JSON.parse(jsonInput.value);
+      jsonOutput.textContent = 'Valid JSON ✓';
+    }catch(e){ jsonOutput.textContent = 'Invalid JSON: ' + e.message; }
+  });
+  jsonCopy.addEventListener('click', ()=> navigator.clipboard.writeText(jsonInput.value).then(()=> jsonOutput.textContent = 'Copied ✓'));
+
+  /* =========================
+     7. Password Generator
+     ========================= */
+  const passLen = $('#passLen'), passUpper = $('#passUpper'), passLower = $('#passLower'), passNums = $('#passNums'), passSymbols = $('#passSymbols'), genPass = $('#genPass'), passOutput = $('#passOutput'), copyPass = $('#copyPass');
+
+  function genPassword(len, options){
+    const parts = [];
+    if(options.upper) parts.push(...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''));
+    if(options.lower) parts.push(...'abcdefghijklmnopqrstuvwxyz'.split(''));
+    if(options.nums) parts.push(...'0123456789'.split(''));
+    if(options.symbols) parts.push(...'!@#$%^&*()-_=+[]{};:,.<>/?'.split(''));
+    if(parts.length === 0) return '';
+    // Use crypto to generate randomness
+    const arr = new Uint32Array(len);
+    crypto.getRandomValues(arr);
+    let out = '';
+    for(let i=0;i<len;i++){
+      out += parts[arr[i] % parts.length];
+    }
+    return out;
+  }
+  genPass.addEventListener('click', ()=>{
+    const len = Math.min(128, Math.max(4, Number(passLen.value) || 16));
+    const options = { upper: passUpper.checked, lower: passLower.checked, nums: passNums.checked, symbols: passSymbols.checked };
+    const p = genPassword(len, options);
+    passOutput.textContent = p || 'Select at least one character set';
+  });
+  copyPass.addEventListener('click', ()=> navigator.clipboard.writeText(passOutput.textContent).then(()=> passOutput.textContent = passOutput.textContent + ' (copied)'));
+
+  /* =========================
+     8. UUID v4 (RFC4122) generator
+     ========================= */
+  const genUUIDBtn = $('#genUUID'), uuidOutput = $('#uuidOutput'), copyUUID = $('#copyUUID');
+  function uuidv4(){
+    // Use crypto.getRandomValues
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    // Per RFC: set version to 4 -> bytes[6] = (bytes[6] & 0x0f) | 0x40
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    // set variant to RFC4122 -> bytes[8] = (bytes[8] & 0x3f) | 0x80
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = [...bytes].map(b => b.toString(16).padStart(2,'0')).join('');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  }
+  genUUIDBtn.addEventListener('click', ()=> { uuidOutput.textContent = uuidv4(); });
+  copyUUID.addEventListener('click', ()=> navigator.clipboard.writeText(uuidOutput.textContent).then(()=> uuidOutput.textContent = uuidOutput.textContent + ' (copied)'));
+
+  /* =========================
+     9. Hash Generator (SHA-256)
+     ========================= */
+  const hashInput = $('#hashInput'), hashDo = $('#hashDo'), hashOutput = $('#hashOutput'), hashCopy = $('#hashCopy'), hashFormat = $('#hashFormat');
+
+  async function sha256(input, fmt='hex'){
+    const enc = new TextEncoder();
+    const data = enc.encode(input);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    const bytes = new Uint8Array(hash);
+    if(fmt === 'hex'){
+      return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join('');
+    }else if(fmt === 'base64'){
+      let binary = '';
+      for(let i=0;i<bytes.byteLength;i++) binary += String.fromCharCode(bytes[i]);
+      return btoa(binary);
+    }
+    return '';
+  }
+  hashDo.addEventListener('click', async ()=> {
+    const out = await sha256(hashInput.value || '', hashFormat.value);
+    hashOutput.textContent = out;
+  });
+  hashCopy.addEventListener('click', ()=> navigator.clipboard.writeText(hashOutput.textContent).then(()=> hashOutput.textContent = hashOutput.textContent + ' (copied)'));
+
+  /* =========================
+     10. Image Resizer & Compressor (Canvas)
+     ========================= */
+  const imgFile = $('#imgFile'), imgWidth = $('#imgWidth'), imgHeight = $('#imgHeight'), imgQuality = $('#imgQuality'), imgProcess = $('#imgProcess'), imgCanvas = $('#imgCanvas'), imgPreview = $('#imgPreview'), imgDownload = $('#imgDownload');
+  let currentImage = null;
+
+  imgFile.addEventListener('change', (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const url = URL.createObjectURL(f);
+    currentImage = new Image();
+    currentImage.onload = ()=>{
+      imgPreview.textContent = `Loaded: ${f.name} — ${currentImage.width}x${currentImage.height}px`;
+      // Suggest width/height
+      imgWidth.value = currentImage.width;
+      imgHeight.value = currentImage.height;
+    };
+    currentImage.src = url;
+  });
+
+  imgProcess.addEventListener('click', ()=>{
+    if(!currentImage) { imgPreview.textContent = 'No image loaded'; return; }
+    let w = Number(imgWidth.value) || currentImage.width;
+    let h = Number(imgHeight.value) || currentImage.height;
+    // Maintain aspect ratio if one omitted
+    if(!imgWidth.value) w = Math.round(currentImage.width * (h / currentImage.height));
+    if(!imgHeight.value) h = Math.round(currentImage.height * (w / currentImage.width));
+    imgCanvas.width = w; imgCanvas.height = h;
+    const ctx = imgCanvas.getContext('2d');
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(currentImage, 0, 0, w, h);
+    const quality = Number(imgQuality.value) || 0.9;
+    imgCanvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      imgDownload.href = url;
+      imgDownload.download = 'resized.jpg';
+      imgPreview.textContent = `Processed: ${w}x${h} — quality ${quality}`;
+    }, 'image/jpeg', quality);
+  });
+
+  /* =========================
+     11. Color Picker + Contrast Checker
+     ========================= */
+  const colorA = $('#colorA'), colorB = $('#colorB'), checkContrast = $('#checkContrast'), contrastOut = $('#contrastOut');
+
+  function hexToRgb(hex){
+    const v = hex.replace('#','');
+    const bigint = parseInt(v, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return [r,g,b];
+  }
+  function luminance(rgb){
+    const srgb = rgb.map(v => v/255).map(c => (c <= 0.03928) ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4));
+    return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+  }
+  function contrastRatio(hex1, hex2){
+    const L1 = luminance(hexToRgb(hex1));
+    const L2 = luminance(hexToRgb(hex2));
+    const bright = Math.max(L1,L2), dark = Math.min(L1,L2);
+    return (bright + 0.05) / (dark + 0.05);
+  }
+  checkContrast.addEventListener('click', ()=>{
+    const a = colorA.value, b = colorB.value;
+    const ratio = contrastRatio(a,b);
+    const passAA = ratio >= 4.5;
+    const passAAA = ratio >= 7;
+    contrastOut.textContent = `Ratio ${ratio.toFixed(2)} :1 — AA ${passAA ? '✓' : '✗'} · AAA ${passAAA ? '✓' : '✗'}`;
+  });
+
+  /* =========================
+     12. Stopwatch & Countdown Timer
+     ========================= */
+  const startSW = $('#startSW'), pauseSW = $('#pauseSW'), resetSW = $('#resetSW'), startCountdown = $('#startCountdown'), stopCountdown = $('#stopCountdown'), countdownInput = $('#countdownInput'), timerDisplay = $('#timerDisplay');
+  let swStart = 0, swElapsed = 0, swTimer = null;
+  let countdownTimer = null, countdownRemaining = 0;
+
+  function formatTime(ms){
+    const total = Math.max(0, Math.floor(ms));
+    const minutes = Math.floor(total/60000);
+    const seconds = Math.floor((total%60000)/1000);
+    const cent = Math.floor((total%1000)/10);
+    return `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}.${String(cent).padStart(2,'0')}`;
+  }
+
+  function updateSW(){
+    swElapsed = Date.now() - swStart;
+    timerDisplay.textContent = formatTime(swElapsed);
+  }
+  startSW.addEventListener('click', ()=>{
+    if(swTimer) return;
+    swStart = Date.now() - swElapsed;
+    swTimer = setInterval(updateSW, 50);
+  });
+  pauseSW.addEventListener('click', ()=>{
+    if(swTimer){ clearInterval(swTimer); swTimer = null; swElapsed = Date.now() - swStart; }
+  });
+  resetSW.addEventListener('click', ()=>{ if(swTimer) clearInterval(swTimer); swTimer = null; swElapsed = 0; swStart = 0; timerDisplay.textContent = '00:00.00'; });
+
+  startCountdown.addEventListener('click', ()=>{
+    if(countdownTimer) clearInterval(countdownTimer);
+    countdownRemaining = Math.max(0, Number(countdownInput.value) || 0) * 1000;
+    const until = Date.now() + countdownRemaining;
+    countdownTimer = setInterval(()=> {
+      countdownRemaining = until - Date.now();
+      if(countdownRemaining <= 0){ clearInterval(countdownTimer); countdownTimer = null; timerDisplay.textContent = '00:00.00'; new Audio().play?.(); return; }
+      timerDisplay.textContent = formatTime(countdownRemaining);
+    }, 100);
+  });
+  stopCountdown.addEventListener('click', ()=> { if(countdownTimer) clearInterval(countdownTimer); countdownTimer = null; timerDisplay.textContent='00:00.00'; });
+
+  /* =========================
+     13. Quick Notes (localStorage)
+     ========================= */
+  const notesArea = $('#notesArea'), saveNotes = $('#saveNotes'), clearNotes = $('#clearNotes'), notesStatus = $('#notesStatus');
+  const NOTES_KEY = 'toolspacknew.notes.v1';
+  function loadNotes(){
+    const s = localStorage.getItem(NOTES_KEY) || '';
+    notesArea.value = s;
+    notesStatus.textContent = 'Loaded';
+    setTimeout(()=>notesStatus.textContent = 'Autosaved locally', 900);
+  }
+  // Autosave debounce
+  let autosaveTimer = null;
+  notesArea.addEventListener('input', ()=> {
+    notesStatus.textContent = 'Saving...';
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(()=> {
+      localStorage.setItem(NOTES_KEY, notesArea.value);
+      notesStatus.textContent = 'Saved';
+      setTimeout(()=>notesStatus.textContent = 'Autosaved locally', 1000);
+    }, 600);
+  });
+  saveNotes.addEventListener('click', ()=> {
+    localStorage.setItem(NOTES_KEY, notesArea.value);
+    notesStatus.textContent = 'Saved';
+  });
+  clearNotes.addEventListener('click', ()=> {
+    if(confirm('Clear all notes?')) {
+      notesArea.value = '';
+      localStorage.removeItem(NOTES_KEY);
+      notesStatus.textContent = 'Cleared';
+    }
+  });
+  loadNotes();
+
+  /* =========================
+     Utility: copy buttons global handler
+     ========================= */
+  $$('.copy').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      // If associated with an output next to it, find nearest .muted.small
+      const card = btn.closest('.card');
+      if(card){
+        const output = card.querySelector('.muted.small') || card.querySelector('input,textarea');
+        const val = output ? (output.value ?? output.textContent ?? '') : '';
+        navigator.clipboard.writeText(String(val)).then(()=> {
+          // tiny feedback
+          const prev = btn.textContent;
+          btn.textContent = 'Copied';
+          setTimeout(()=> btn.textContent = prev, 1200);
+        });
+      }
+    });
+  });
+
+  /* =========================
+     Accessibility enhancements
+     ========================= */
+  // Make sure first tool input is focusable
+  setTimeout(()=> {
+    const firstInput = document.querySelector('.tool-card input, .tool-card textarea');
+    if(firstInput) firstInput.tabIndex = 0;
+  }, 500);
+
+  /* =========================
+     Finalize: small startup tasks
+     ========================= */
+  // Hide ad placeholders by default if user wants
+  // (developer: Ads-ready — placeholders are visible; toggle via button)
+  // Smooth scroll polyfill for anchorless focus
+  document.documentElement.style.scrollBehavior = 'smooth';
+
+  // Quick keyboard shortcuts for common actions
+  document.addEventListener('keydown', (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='f'){ e.preventDefault(); gSearch.focus(); }
+  });
+
+  // Version info
+  $('#version').textContent = 'ToolsPackNew v1.0 (single-file)';
+})();
+</script>
+</body>
+</html>
